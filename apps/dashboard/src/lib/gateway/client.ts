@@ -23,7 +23,7 @@ import type {
   ConnectParams,
 } from "./types"
 
-const PROTOCOL_VERSION = 1
+const PROTOCOL_VERSION = 3
 const DEFAULT_TIMEOUT_MS = 30_000
 const MAX_RECONNECT_ATTEMPTS = 5
 const INITIAL_BACKOFF_MS = 1000
