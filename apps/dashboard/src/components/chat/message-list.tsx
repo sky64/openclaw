@@ -93,7 +93,7 @@ export function MessageList({
 
             return (
               <MessageBubble
-                key={message.id}
+                key={message.id || `msg-${index}`}
                 role={message.role}
                 content={message.content}
                 timestamp={message.timestamp}

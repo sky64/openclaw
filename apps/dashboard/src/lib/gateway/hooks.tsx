@@ -116,7 +116,14 @@ export function useChat(sessionKey?: string): UseChatReturn {
     client
       .chatHistory({ sessionKey })
       .then((history) => {
-        setMessages(history)
+        // Ensure content is always a string (gateway may return objects)
+        const normalizedHistory = history.map((msg) => ({
+          ...msg,
+          content: typeof msg.content === 'string'
+            ? msg.content
+            : extractMessageContent(msg.content),
+        }))
+        setMessages(normalizedHistory)
       })
       .catch((err) => {
         setError(err instanceof Error ? err : new Error(String(err)))

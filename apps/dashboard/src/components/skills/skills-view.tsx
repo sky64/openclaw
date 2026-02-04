@@ -121,9 +121,9 @@ export function SkillsView({ className }: SkillsViewProps) {
             }}
           >
             <AnimatePresence mode="popLayout">
-              {filteredSkills.map((skill) => (
+              {filteredSkills.map((skill, index) => (
                 <motion.div
-                  key={skill.name}
+                  key={skill.name || `skill-${index}`}
                   variants={{
                     hidden: { opacity: 0, y: 20 },
                     visible: { opacity: 1, y: 0 },

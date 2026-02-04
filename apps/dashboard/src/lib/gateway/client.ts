@@ -254,7 +254,7 @@ export class GatewayClient {
     // Send connect request; the response handling will set connected = true
     void this.request<HelloOk>("connect", params as unknown as Record<string, unknown>).catch((err) => {
       this.onErrorCallback?.(err instanceof Error ? err : new Error(String(err)))
-      this.ws?.close(1008, "connect failed")
+      this.ws?.close(4000, "connect failed")
     })
   }
 

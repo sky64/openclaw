@@ -215,9 +215,9 @@ function ChannelsSection({ health }: ChannelsSectionProps) {
           No channels configured
         </div>
       ) : (
-        channelEntries.map(([name, status]) => (
+        channelEntries.map(([name, status], index) => (
           <ConfigField
-            key={name}
+            key={name || `channel-${index}`}
             label={name}
             description={status.error ?? undefined}
           >
