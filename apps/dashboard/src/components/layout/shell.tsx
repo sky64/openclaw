@@ -7,6 +7,8 @@ import { Header } from "./header"
 interface ShellProps {
   children: (activeView: ViewId) => ReactNode
   defaultView?: ViewId
+  activeView?: ViewId
+  onViewChange?: (view: ViewId) => void
   connected?: boolean
   version?: string
   uptime?: string
@@ -21,12 +23,17 @@ interface ShellProps {
 export function Shell({
   children,
   defaultView = "chat",
+  activeView: controlledActiveView,
+  onViewChange,
   connected = false,
   version,
   uptime,
   onCommandPalette,
 }: ShellProps) {
-  const [activeView, setActiveView] = useState<ViewId>(defaultView)
+  // Support both controlled and uncontrolled modes
+  const [internalActiveView, setInternalActiveView] = useState<ViewId>(defaultView)
+  const activeView = controlledActiveView ?? internalActiveView
+  const setActiveView = onViewChange ?? setInternalActiveView
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   // Handle keyboard shortcuts

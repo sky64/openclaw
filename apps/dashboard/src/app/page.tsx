@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Shell, type ViewId } from "@/components/layout"
 import { ConnectionDialog } from "@/components/dialogs"
+import { CommandPalette } from "@/components/command-palette"
 import { ChatView } from "@/components/chat"
 import { CLIView } from "@/components/cli"
 import { ProcessesView } from "@/components/processes"
@@ -30,8 +31,11 @@ function PlaceholderView({ name }: { name: string }) {
 export default function Home() {
   const { connected } = useGateway()
 
-  // Command palette state will be used when the component is implemented
-  const [_commandPaletteOpen, setCommandPaletteOpen] = useState(false)
+  // Active view state (lifted up to support command palette navigation)
+  const [activeView, setActiveView] = useState<ViewId>("chat")
+
+  // Command palette state
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
 
   // Connection dialog state - show after 500ms delay when not connected
   const [connectionDialogOpen, setConnectionDialogOpen] = useState(false)
@@ -45,13 +49,16 @@ export default function Home() {
     }
   }, [connected])
 
-  const handleCommandPalette = () => {
+  const handleCommandPalette = useCallback(() => {
     setCommandPaletteOpen(true)
-    // TODO: Open command palette dialog (Task #12)
-  }
+  }, [])
 
-  const renderView = (activeView: ViewId) => {
-    switch (activeView) {
+  const handleNavigate = useCallback((view: string) => {
+    setActiveView(view as ViewId)
+  }, [])
+
+  const renderView = (view: ViewId) => {
+    switch (view) {
       case "chat":
         return <ChatView />
       case "cli":
@@ -70,7 +77,8 @@ export default function Home() {
   return (
     <>
       <Shell
-        defaultView="chat"
+        activeView={activeView}
+        onViewChange={setActiveView}
         connected={connected}
         version="v0.1.0-alpha"
         uptime="--"
@@ -78,6 +86,12 @@ export default function Home() {
       >
         {renderView}
       </Shell>
+
+      <CommandPalette
+        open={commandPaletteOpen}
+        onOpenChange={setCommandPaletteOpen}
+        onNavigate={handleNavigate}
+      />
 
       <ConnectionDialog
         open={connectionDialogOpen}
