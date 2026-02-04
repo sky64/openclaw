@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, type ReactNode } from "react"
 import { Sidebar, type ViewId } from "./sidebar"
 import { Header } from "./header"
+import { MobileNav } from "./mobile-nav"
 
 interface ShellProps {
   children: (activeView: ViewId) => ReactNode
@@ -57,25 +58,33 @@ export function Shell({
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Sidebar */}
-      <Sidebar
-        activeView={activeView}
-        onViewChange={(view) => setActiveView(view as ViewId)}
-        collapsed={sidebarCollapsed}
-        onCollapsedChange={setSidebarCollapsed}
-        connected={connected}
-        version={version}
-        uptime={uptime}
-      />
+      {/* Desktop Sidebar - hidden on mobile */}
+      <div className="hidden md:block">
+        <Sidebar
+          activeView={activeView}
+          onViewChange={(view) => setActiveView(view as ViewId)}
+          collapsed={sidebarCollapsed}
+          onCollapsedChange={setSidebarCollapsed}
+          connected={connected}
+          version={version}
+          uptime={uptime}
+        />
+      </div>
 
       {/* Main content area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
         <Header onCommandPalette={onCommandPalette} />
 
-        {/* Content */}
-        <main className="flex-1 overflow-auto">{children(activeView)}</main>
+        {/* Content - padding bottom on mobile for bottom nav */}
+        <main className="flex-1 overflow-auto pb-20 md:pb-4">{children(activeView)}</main>
       </div>
+
+      {/* Mobile Bottom Navigation - hidden on desktop */}
+      <MobileNav
+        activeView={activeView}
+        onViewChange={(view) => setActiveView(view as ViewId)}
+      />
     </div>
   )
 }
