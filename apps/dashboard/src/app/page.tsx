@@ -1,7 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Shell, type ViewId } from "@/components/layout"
+import { ConnectionDialog } from "@/components/dialogs"
+import { useGateway } from "@/lib/gateway/hooks"
 
 /**
  * Placeholder view component for development.
@@ -21,8 +23,22 @@ function PlaceholderView({ name }: { name: string }) {
 }
 
 export default function Home() {
+  const { connected } = useGateway()
+
   // Command palette state will be used when the component is implemented
   const [_commandPaletteOpen, setCommandPaletteOpen] = useState(false)
+
+  // Connection dialog state - show after 500ms delay when not connected
+  const [connectionDialogOpen, setConnectionDialogOpen] = useState(false)
+
+  useEffect(() => {
+    if (!connected) {
+      const timer = setTimeout(() => {
+        setConnectionDialogOpen(true)
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+  }, [connected])
 
   const handleCommandPalette = () => {
     setCommandPaletteOpen(true)
@@ -47,14 +63,21 @@ export default function Home() {
   }
 
   return (
-    <Shell
-      defaultView="chat"
-      connected={true} // Will be connected to gateway state
-      version="v0.1.0-alpha"
-      uptime="--"
-      onCommandPalette={handleCommandPalette}
-    >
-      {renderView}
-    </Shell>
+    <>
+      <Shell
+        defaultView="chat"
+        connected={connected}
+        version="v0.1.0-alpha"
+        uptime="--"
+        onCommandPalette={handleCommandPalette}
+      >
+        {renderView}
+      </Shell>
+
+      <ConnectionDialog
+        open={connectionDialogOpen}
+        onOpenChange={setConnectionDialogOpen}
+      />
+    </>
   )
 }
