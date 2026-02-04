@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Shell, type ViewId } from "@/components/layout"
 import { ConnectionDialog } from "@/components/dialogs"
+import { ChatView } from "@/components/chat"
 import { useGateway } from "@/lib/gateway/hooks"
 
 /**
@@ -48,7 +49,7 @@ export default function Home() {
   const renderView = (activeView: ViewId) => {
     switch (activeView) {
       case "chat":
-        return <PlaceholderView name="Chat" />
+        return <ChatView />
       case "cli":
         return <PlaceholderView name="CLI Terminal" />
       case "processes":
