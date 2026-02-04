@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Shell, type ViewId } from "@/components/layout"
 import { ConnectionDialog } from "@/components/dialogs"
 import { ChatView } from "@/components/chat"
+import { CLIView } from "@/components/cli"
 import { useGateway } from "@/lib/gateway/hooks"
 
 /**
@@ -51,7 +52,7 @@ export default function Home() {
       case "chat":
         return <ChatView />
       case "cli":
-        return <PlaceholderView name="CLI Terminal" />
+        return <CLIView />
       case "processes":
         return <PlaceholderView name="Processes" />
       case "skills":
