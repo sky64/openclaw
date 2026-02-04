@@ -77,7 +77,7 @@ export class GatewayClient {
   constructor(options: GatewayClientOptions) {
     this.url = options.url
     this.token = options.token
-    this.clientId = options.clientId ?? "openclaw-control-ui"
+    this.clientId = options.clientId ?? "webchat-ui"
     this.clientVersion = options.clientVersion ?? "0.1.0"
     this.platform = options.platform ?? "web"
     this.onConnectCallback = options.onConnect
