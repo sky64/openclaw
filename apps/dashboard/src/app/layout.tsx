@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from "next"
+import { GatewayProvider } from "@/components/providers/gateway-provider"
+import "./globals.css"
 
 export const metadata: Metadata = {
   title: "SKY64 | Agent Orchestration System",
@@ -12,16 +13,18 @@ export const metadata: Metadata = {
       },
     ],
   },
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">{children}</body>
+    <html lang="en" className="dark">
+      <body className="min-h-screen antialiased">
+        <GatewayProvider>{children}</GatewayProvider>
+      </body>
     </html>
-  );
+  )
 }
