@@ -6,6 +6,7 @@ import { ConnectionDialog } from "@/components/dialogs"
 import { ChatView } from "@/components/chat"
 import { CLIView } from "@/components/cli"
 import { ProcessesView } from "@/components/processes"
+import { SkillsView } from "@/components/skills"
 import { useGateway } from "@/lib/gateway/hooks"
 
 /**
@@ -57,7 +58,7 @@ export default function Home() {
       case "processes":
         return <ProcessesView />
       case "skills":
-        return <PlaceholderView name="Skills" />
+        return <SkillsView />
       case "config":
         return <PlaceholderView name="Config" />
       default:
