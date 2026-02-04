@@ -77,7 +77,7 @@ export class GatewayClient {
   constructor(options: GatewayClientOptions) {
     this.url = options.url
     this.token = options.token
-    this.clientId = options.clientId ?? "sky64-dashboard"
+    this.clientId = options.clientId ?? "openclaw-control-ui"
     this.clientVersion = options.clientVersion ?? "0.1.0"
     this.platform = options.platform ?? "web"
     this.onConnectCallback = options.onConnect
@@ -243,7 +243,7 @@ export class GatewayClient {
         id: this.clientId,
         version: this.clientVersion,
         platform: this.platform,
-        mode: "dashboard",
+        mode: "ui",
       },
       caps: [],
       auth: this.token ? { token: this.token } : undefined,
