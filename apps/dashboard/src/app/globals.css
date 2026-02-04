@@ -1,6 +1,6 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import url('https://fonts.vercel.app/v1/font/geist-sans/1.0.0/geist-sans.css');
+@import "tailwindcss";
 
 :root {
   --background: #000000;
