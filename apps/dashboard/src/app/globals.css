@@ -1,8 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-@import url('https://fonts.vercel.app/v1/font/geist-sans/1.0.0/geist-sans.css');
 @import "tailwindcss";
 
 :root {
+  /* Light mode (default) */
+  --background: #ffffff;
+  --foreground: #0b0f14;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --border: #e4e4e7;
+  --accent: #f59e0b;
+  --accent-foreground: #000000;
+
+  /* Surface levels for depth */
+  --surface-1: #ffffff;
+  --surface-2: #fafafa;
+  --surface-3: #f4f4f5;
+  --surface-1-border: #e4e4e7;
+  --surface-2-border: #d4d4d8;
+  --surface-3-border: #a1a1aa;
+
+  /* Fonts */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+.dark {
+  /* Dark mode */
   --background: #000000;
   --foreground: #fafafa;
   --muted: #18181b;
@@ -10,11 +34,21 @@
   --border: #27272a;
   --accent: #f59e0b;
   --accent-foreground: #000000;
-  --font-mono: "JetBrains Mono", monospace;
-  --font-sans: "Geist Sans", system-ui, sans-serif;
+
+  /* Surface levels for depth */
+  --surface-1: #09090b;
+  --surface-2: #18181b;
+  --surface-3: #27272a;
+  --surface-1-border: #27272a;
+  --surface-2-border: #3f3f46;
+  --surface-3-border: #52525b;
 }
 
 html {
+  color-scheme: light;
+}
+
+html.dark {
   color-scheme: dark;
 }
 
@@ -24,8 +58,8 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Noise texture overlay */
-body::before {
+/* Noise texture overlay - dark mode only */
+.dark body::before {
   content: "";
   position: fixed;
   inset: 0;
