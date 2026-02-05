@@ -108,26 +108,23 @@ export function LobsterEyes({ className, trackTarget }: LobsterEyesProps) {
           animate={{ scaleY: isOpen ? 0 : 1 }}
           transition={{ duration: 0.7, ease: "easeInOut", delay: 0.3 }}
         />
-        {/* Eye */}
-        <div className="w-20 h-28 rounded-[50%] bg-gradient-to-b from-zinc-900 to-zinc-800 dark:from-zinc-100 dark:to-zinc-200 flex items-center justify-center overflow-hidden border-4 border-zinc-700 dark:border-zinc-300">
-          {/* Iris */}
+        {/* Eye - just the gold iris */}
+        <motion.div
+          className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/50"
+          initial={{ scale: 0.8 }}
+          animate={{ scale: isOpen ? 1 : 0.8 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          {/* Pupil */}
           <motion.div
-            className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/50"
-            initial={{ scale: 0.8 }}
-            animate={{ scale: isOpen ? 1 : 0.8 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          >
-            {/* Pupil */}
-            <motion.div
-              className="w-5 h-5 rounded-full bg-black"
-              initial={{ scale: 0 }}
-              animate={{ scale: isOpen ? 1 : 0 }}
-              transition={{ duration: 0.3, delay: 0.8 }}
-            />
-            {/* Glint */}
-            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-white/80" />
-          </motion.div>
-        </div>
+            className="w-6 h-6 rounded-full bg-zinc-950"
+            initial={{ scale: 0 }}
+            animate={{ scale: isOpen ? 1 : 0 }}
+            transition={{ duration: 0.3, delay: 0.8 }}
+          />
+          {/* Glint */}
+          <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-amber-200/60" />
+        </motion.div>
       </motion.div>
 
       {/* Right Eye */}
@@ -143,26 +140,23 @@ export function LobsterEyes({ className, trackTarget }: LobsterEyesProps) {
           animate={{ scaleY: isOpen ? 0 : 1 }}
           transition={{ duration: 0.7, ease: "easeInOut", delay: 0.5 }}
         />
-        {/* Eye */}
-        <div className="w-20 h-28 rounded-[50%] bg-gradient-to-b from-zinc-900 to-zinc-800 dark:from-zinc-100 dark:to-zinc-200 flex items-center justify-center overflow-hidden border-4 border-zinc-700 dark:border-zinc-300">
-          {/* Iris */}
+        {/* Eye - just the gold iris */}
+        <motion.div
+          className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/50"
+          initial={{ scale: 0.8 }}
+          animate={{ scale: isOpen ? 1 : 0.8 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+        >
+          {/* Pupil */}
           <motion.div
-            className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/50"
-            initial={{ scale: 0.8 }}
-            animate={{ scale: isOpen ? 1 : 0.8 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-          >
-            {/* Pupil */}
-            <motion.div
-              className="w-5 h-5 rounded-full bg-black"
-              initial={{ scale: 0 }}
-              animate={{ scale: isOpen ? 1 : 0 }}
-              transition={{ duration: 0.3, delay: 1 }}
-            />
-            {/* Glint */}
-            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-white/80" />
-          </motion.div>
-        </div>
+            className="w-6 h-6 rounded-full bg-zinc-950"
+            initial={{ scale: 0 }}
+            animate={{ scale: isOpen ? 1 : 0 }}
+            transition={{ duration: 0.3, delay: 1 }}
+          />
+          {/* Glint */}
+          <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-amber-200/60" />
+        </motion.div>
       </motion.div>
     </div>
   )

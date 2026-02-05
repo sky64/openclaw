@@ -10,18 +10,20 @@ export default function LoginPage() {
   const formRef = useRef<HTMLDivElement>(null)
 
   const handleLogin = async (email: string, password: string) => {
-    // Simulate login - replace with real auth logic
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 800))
 
-    // For now, just redirect to dashboard
-    // In production, validate credentials against gateway
-    if (email && password) {
-      setTimeout(() => {
-        router.push("/")
-      }, 500)
-    } else {
-      throw new Error("Invalid credentials")
+    // Hardcoded password for now
+    const SECRET = "lobster"
+
+    if (password !== SECRET) {
+      throw new Error("Invalid password")
     }
+
+    // Success - redirect to dashboard
+    setTimeout(() => {
+      router.push("/")
+    }, 500)
   }
 
   return (
