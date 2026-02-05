@@ -1,33 +1,29 @@
-import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss"
 
 const config: Config = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+  darkMode: "class",
+  content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        background: "#000000",
-        foreground: "#fafafa",
-        muted: {
-          DEFAULT: "#18181b",
-          foreground: "#71717a",
-        },
-        border: "#27272a",
-        accent: {
-          DEFAULT: "#f59e0b",
-          foreground: "#000000",
-        },
+        background: "var(--background)",
+        foreground: "var(--foreground)",
+        muted: "var(--muted)",
+        "muted-foreground": "var(--muted-foreground)",
+        border: "var(--border)",
+        accent: "var(--accent)",
+        "accent-foreground": "var(--accent-foreground)",
+        "surface-1": "var(--surface-1)",
+        "surface-2": "var(--surface-2)",
+        "surface-3": "var(--surface-3)",
       },
       fontFamily: {
-        mono: ['"JetBrains Mono"', "monospace"],
-        sans: ['"Geist Sans"', "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
       },
     },
   },
   plugins: [],
-};
+}
 
-export default config;
+export default config
