@@ -353,21 +353,27 @@ export function CLIView({ className }: CLIViewProps) {
   // Not connected state
   if (!connected) {
     return (
-      <div className={cn("h-full flex flex-col", className)}>
-        <CLIHeader />
-        <div className="flex-1 flex items-center justify-center bg-black">
+      <div className={cn("h-full flex flex-col gap-5 p-5", className)}>
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-bold tracking-wide">CLI Playground</h1>
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-500/10 border border-zinc-500/20">
+            <div className="w-2 h-2 rounded-full bg-zinc-500" />
+            <span className="text-xs font-medium text-zinc-500">Disconnected</span>
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center bg-[var(--surface-1)] rounded-2xl border border-[var(--surface-1-border)]">
           <motion.div
-            className="flex flex-col items-center gap-4 text-muted-foreground p-8"
+            className="flex flex-col items-center gap-5 text-muted-foreground p-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <div className="w-20 h-20 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-              <PlugsConnected size={40} className="text-zinc-600" />
+            <div className="w-24 h-24 rounded-2xl bg-[var(--surface-2)] border border-[var(--surface-2-border)] flex items-center justify-center">
+              <PlugsConnected size={48} className="text-muted-foreground/50" />
             </div>
-            <div className="text-center font-mono">
-              <p className="text-sm text-green-500">CONNECTION REQUIRED</p>
-              <p className="text-xs mt-1 max-w-[280px] text-zinc-500">
-                Connect to the gateway to access the terminal
+            <div className="text-center">
+              <p className="text-lg font-semibold">Connection Required</p>
+              <p className="text-sm mt-2 max-w-[300px] text-muted-foreground">
+                Connect to the gateway to access the CLI playground
               </p>
             </div>
           </motion.div>
@@ -377,23 +383,23 @@ export function CLIView({ className }: CLIViewProps) {
   }
 
   return (
-    <div className={cn("h-full flex flex-col gap-4 p-4", className)}>
+    <div className={cn("h-full flex flex-col gap-5 p-5", className)}>
       <CLIHeader version={health?.version} uptime={health?.uptime} />
 
       {/* Dual Pane Layout */}
-      <div className="flex-1 flex flex-col md:flex-row gap-4 min-h-0">
+      <div className="flex-1 flex flex-col lg:flex-row gap-5 min-h-0">
         {/* Input Panel - Left on desktop, Top on mobile */}
         <InputPanel
           onRun={handleCommand}
           disabled={!connected}
-          className="flex-1 min-h-[200px] md:min-h-0"
+          className="flex-1 min-h-[250px] lg:min-h-0"
         />
 
         {/* Output Panel - Right on desktop, Bottom on mobile */}
         <OutputPanel
           lines={lines}
           onClear={handleClearOutput}
-          className="flex-1 min-h-[200px] md:min-h-0"
+          className="flex-1 min-h-[250px] lg:min-h-0"
         />
       </div>
 
@@ -404,7 +410,7 @@ export function CLIView({ className }: CLIViewProps) {
           onCommand={handleCommand}
           prompt="sky64>"
           disabled={!connected}
-          className="h-14 rounded-xl"
+          className="h-16 rounded-2xl text-base"
           minimal
         />
       </div>
@@ -433,25 +439,24 @@ function CLIHeader({
   }
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-black rounded-xl">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-          <TerminalIcon size={18} className="text-green-500" />
-        </div>
-        <div>
-          <h2 className="text-sm font-medium text-green-500 font-mono">
-            SKY64 TERMINAL
-          </h2>
-          <p className="text-[10px] text-zinc-500 font-mono">
-            {version ?? "---"}
-          </p>
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <h1 className="text-2xl font-bold tracking-wide">CLI Playground</h1>
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <span className="text-xs font-medium text-green-500">Connected</span>
         </div>
       </div>
-      {uptime !== undefined && (
-        <div className="text-[10px] text-zinc-500 font-mono">
-          UPTIME: {formatUptime(uptime)}
-        </div>
-      )}
+      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        {version && (
+          <span className="font-mono">{version}</span>
+        )}
+        {uptime !== undefined && (
+          <span className="font-mono">
+            Uptime: {formatUptime(uptime)}
+          </span>
+        )}
+      </div>
     </div>
   )
 }
