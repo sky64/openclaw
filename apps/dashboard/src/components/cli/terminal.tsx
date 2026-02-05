@@ -28,6 +28,8 @@ export interface TerminalProps {
   prompt?: string
   disabled?: boolean
   className?: string
+  /** When true, hides the output area and only shows the input line */
+  minimal?: boolean
 }
 
 /**
@@ -40,6 +42,7 @@ export function Terminal({
   prompt = "sky64>",
   disabled = false,
   className,
+  minimal = false,
 }: TerminalProps) {
   const [input, setInput] = useState("")
   const [historyIndex, setHistoryIndex] = useState(-1)
@@ -100,22 +103,25 @@ export function Terminal({
       ref={containerRef}
       onClick={handleContainerClick}
       className={cn(
-        "h-full bg-black overflow-y-auto cursor-text p-4 font-mono text-sm",
+        "bg-black cursor-text font-mono text-sm",
         // Subtle scanline effect
         "bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.05)_50%)]",
         "bg-[length:100%_4px]",
+        minimal ? "flex items-center px-4" : "h-full overflow-y-auto p-4",
         className
       )}
     >
-      {/* Terminal output lines */}
-      <div className="space-y-1">
-        {lines.map((line) => (
-          <TerminalLineComponent key={line.id} line={line} prompt={prompt} />
-        ))}
-      </div>
+      {/* Terminal output lines - hidden in minimal mode */}
+      {!minimal && (
+        <div className="space-y-1">
+          {lines.map((line) => (
+            <TerminalLineComponent key={line.id} line={line} prompt={prompt} />
+          ))}
+        </div>
+      )}
 
       {/* Input line */}
-      <div className="flex items-center mt-1">
+      <div className={cn("flex items-center", !minimal && "mt-1")}>
         <span className="text-green-500 mr-2 select-none">{prompt}</span>
         <input
           ref={inputRef}
@@ -124,7 +130,7 @@ export function Terminal({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={disabled}
-          autoFocus
+          autoFocus={!minimal}
           className={cn(
             "flex-1 bg-transparent border-none outline-none text-green-400",
             "caret-green-500 font-mono text-sm",

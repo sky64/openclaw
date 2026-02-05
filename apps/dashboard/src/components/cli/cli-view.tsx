@@ -6,6 +6,8 @@ import { Terminal as TerminalIcon, PlugsConnected } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { useGateway } from "@/lib/gateway/hooks"
 import { Terminal, type TerminalLine } from "./terminal"
+import { InputPanel } from "./input-panel"
+import { OutputPanel } from "./output-panel"
 
 /**
  * CLI View component props.
@@ -15,8 +17,10 @@ export interface CLIViewProps {
 }
 
 /**
- * Main CLI view that wraps the terminal emulator.
- * Implements gateway commands and displays results.
+ * Main CLI view with dual-pane layout.
+ * Left/Top: InputPanel for multi-line command editing
+ * Right/Bottom: OutputPanel for command output display
+ * Bottom: Quick command input using minimal Terminal
  */
 export function CLIView({ className }: CLIViewProps) {
   const { connected, client, health } = useGateway()
@@ -84,6 +88,11 @@ export function CLIView({ className }: CLIViewProps) {
     },
     [addLine]
   )
+
+  // Clear all output lines
+  const handleClearOutput = useCallback(() => {
+    setLines([])
+  }, [])
 
   // Format uptime from milliseconds
   const formatUptime = useCallback((ms: number): string => {
@@ -368,15 +377,37 @@ export function CLIView({ className }: CLIViewProps) {
   }
 
   return (
-    <div className={cn("h-full flex flex-col", className)}>
+    <div className={cn("h-full flex flex-col gap-4 p-4", className)}>
       <CLIHeader version={health?.version} uptime={health?.uptime} />
-      <Terminal
-        lines={lines}
-        onCommand={handleCommand}
-        prompt="sky64>"
-        disabled={!connected}
-        className="flex-1 min-h-0"
-      />
+
+      {/* Dual Pane Layout */}
+      <div className="flex-1 flex flex-col md:flex-row gap-4 min-h-0">
+        {/* Input Panel - Left on desktop, Top on mobile */}
+        <InputPanel
+          onRun={handleCommand}
+          disabled={!connected}
+          className="flex-1 min-h-[200px] md:min-h-0"
+        />
+
+        {/* Output Panel - Right on desktop, Bottom on mobile */}
+        <OutputPanel
+          lines={lines}
+          onClear={handleClearOutput}
+          className="flex-1 min-h-[200px] md:min-h-0"
+        />
+      </div>
+
+      {/* Quick Command Input */}
+      <div className="flex-shrink-0">
+        <Terminal
+          lines={[]}
+          onCommand={handleCommand}
+          prompt="sky64>"
+          disabled={!connected}
+          className="h-14 rounded-xl"
+          minimal
+        />
+      </div>
     </div>
   )
 }
@@ -402,7 +433,7 @@ function CLIHeader({
   }
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-black">
+    <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-black rounded-xl">
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-800 flex items-center justify-center">
           <TerminalIcon size={18} className="text-green-500" />
