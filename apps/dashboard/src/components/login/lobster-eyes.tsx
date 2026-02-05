@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 
 interface LobsterEyesProps {
   className?: string
-  trackTarget?: React.RefObject<HTMLElement>
+  trackTarget?: React.RefObject<HTMLElement | null>
 }
 
 export function LobsterEyes({ className, trackTarget }: LobsterEyesProps) {

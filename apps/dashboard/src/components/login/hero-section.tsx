@@ -8,7 +8,7 @@ import { FloatingParticles } from "./floating-particles"
 
 interface HeroSectionProps {
   className?: string
-  formRef?: React.RefObject<HTMLElement>
+  formRef?: React.RefObject<HTMLElement | null>
 }
 
 export function HeroSection({ className, formRef }: HeroSectionProps) {
@@ -45,7 +45,7 @@ export function HeroSection({ className, formRef }: HeroSectionProps) {
 
       {/* Eyes - positioned at top */}
       <div className="absolute top-[10%] left-1/2 -translate-x-1/2">
-        <LobsterEyes trackTarget={formRef as React.RefObject<HTMLElement>} />
+        <LobsterEyes trackTarget={formRef} />
       </div>
 
       {/* Claw */}
