@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import { motion } from "framer-motion"
+import { motion, useReducedMotion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 interface FloatingParticlesProps {
@@ -13,6 +13,8 @@ export function FloatingParticles({
   count = 12,
   className,
 }: FloatingParticlesProps) {
+  const prefersReducedMotion = useReducedMotion()
+
   const particles = useMemo(() => {
     return Array.from({ length: count }, (_, i) => ({
       id: i,
@@ -23,6 +25,8 @@ export function FloatingParticles({
       delay: Math.random() * 5,
     }))
   }, [count])
+
+  if (prefersReducedMotion) return null
 
   return (
     <div className={cn("absolute inset-0 overflow-hidden pointer-events-none", className)}>

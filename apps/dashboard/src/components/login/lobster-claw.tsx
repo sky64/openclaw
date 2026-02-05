@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
+import { motion, useReducedMotion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 interface LobsterClawProps {
@@ -11,6 +11,7 @@ interface LobsterClawProps {
 
 export function LobsterClaw({ className, size = 200 }: LobsterClawProps) {
   const [isVisible, setIsVisible] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 1000)
@@ -31,7 +32,7 @@ export function LobsterClaw({ className, size = 200 }: LobsterClawProps) {
       {/* Glow effect */}
       <motion.div
         className="absolute inset-0 blur-3xl bg-amber-500/20 rounded-full"
-        animate={{
+        animate={prefersReducedMotion ? { opacity: 0.4 } : {
           scale: [1, 1.1, 1],
           opacity: [0.3, 0.5, 0.3],
         }}
@@ -118,7 +119,7 @@ export function LobsterClaw({ className, size = 200 }: LobsterClawProps) {
       {/* Breathing animation on the whole claw */}
       <motion.div
         className="absolute inset-0"
-        animate={{
+        animate={prefersReducedMotion ? {} : {
           scale: [1, 1.02, 1],
         }}
         transition={{

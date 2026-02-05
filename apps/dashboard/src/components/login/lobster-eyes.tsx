@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import { motion, useAnimationControls } from "framer-motion"
+import { motion, useAnimationControls, useReducedMotion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 interface LobsterEyesProps {
@@ -15,6 +15,7 @@ export function LobsterEyes({ className, trackTarget }: LobsterEyesProps) {
   const eyesRef = useRef<HTMLDivElement>(null)
   const leftEyeControls = useAnimationControls()
   const rightEyeControls = useAnimationControls()
+  const prefersReducedMotion = useReducedMotion()
 
   // Open eyes on mount
   useEffect(() => {
@@ -27,6 +28,7 @@ export function LobsterEyes({ className, trackTarget }: LobsterEyesProps) {
   // Random blink effect
   useEffect(() => {
     if (!isOpen) return
+    if (prefersReducedMotion) return
 
     const blinkBoth = async () => {
       await Promise.all([
@@ -46,7 +48,7 @@ export function LobsterEyes({ className, trackTarget }: LobsterEyesProps) {
     }, 4000 + Math.random() * 4000)
 
     return () => clearInterval(interval)
-  }, [isOpen, leftEyeControls, rightEyeControls])
+  }, [isOpen, leftEyeControls, rightEyeControls, prefersReducedMotion])
 
   // Track target element
   useEffect(() => {
