@@ -5,13 +5,14 @@ import {
   ChatCircle,
   Terminal,
   Lightning,
-  List,
+  PuzzlePiece,
   Gear,
 } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
+import type { ViewId } from "./sidebar"
 
 interface NavItem {
-  id: string
+  id: ViewId
   label: string
   icon: typeof ChatCircle
 }
@@ -20,13 +21,13 @@ const navItems: NavItem[] = [
   { id: "chat", label: "Chat", icon: ChatCircle },
   { id: "cli", label: "CLI", icon: Terminal },
   { id: "processes", label: "Tasks", icon: Lightning },
-  { id: "skills", label: "Skills", icon: List },
+  { id: "skills", label: "Skills", icon: PuzzlePiece },
   { id: "config", label: "Config", icon: Gear },
 ]
 
 interface MobileNavProps {
-  activeView: string
-  onViewChange: (view: string) => void
+  activeView: ViewId
+  onViewChange: (view: ViewId) => void
 }
 
 export function MobileNav({ activeView, onViewChange }: MobileNavProps) {
