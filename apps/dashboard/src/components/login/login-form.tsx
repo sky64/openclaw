@@ -82,8 +82,8 @@ export const LoginForm = forwardRef<HTMLDivElement, LoginFormProps>(
           </div>
         </motion.div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Form - suppressHydrationWarning due to browser extension attribute injection */}
+        <form onSubmit={handleSubmit} className="space-y-5" suppressHydrationWarning>
           {/* Email Field */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -108,6 +108,7 @@ export const LoginForm = forwardRef<HTMLDivElement, LoginFormProps>(
                 "hover:border-[var(--surface-3-border)]"
               )}
               disabled={isLoading || success}
+              suppressHydrationWarning
             />
           </motion.div>
 
@@ -136,6 +137,7 @@ export const LoginForm = forwardRef<HTMLDivElement, LoginFormProps>(
                   "hover:border-[var(--surface-3-border)]"
                 )}
                 disabled={isLoading || success}
+                suppressHydrationWarning
               />
               <button
                 type="button"

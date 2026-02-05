@@ -3,6 +3,7 @@
 /**
  * App-level GatewayProvider wrapper.
  * Handles localStorage persistence for gateway URL and token.
+ * Auto-detects correct gateway URL based on current hostname.
  */
 
 import { type ReactNode, useEffect, useState } from "react"
@@ -10,7 +11,28 @@ import { GatewayProvider as BaseGatewayProvider } from "@/lib/gateway/hooks"
 
 const STORAGE_KEY_URL = "gateway_url"
 const STORAGE_KEY_TOKEN = "gateway_token"
-const DEFAULT_GATEWAY_URL = "http://localhost:18789"
+
+// Gateway URL mapping based on hostname
+const GATEWAY_URL_MAP: Record<string, string> = {
+  "dashboard.sky64.io": "wss://api.sky64.io",
+  "localhost": "ws://localhost:18789",
+  "127.0.0.1": "ws://localhost:18789",
+}
+
+// Default token for sky64.io (can be overridden via localStorage)
+const DEFAULT_TOKEN = "7d30ebb1155d93284bf0ba16c0e658ff28f6d71e8d39e185"
+
+/**
+ * Get the appropriate gateway URL based on current hostname.
+ */
+function getGatewayUrlForHost(): string {
+  if (typeof window === "undefined") {
+    return "ws://localhost:18789"
+  }
+
+  const hostname = window.location.hostname
+  return GATEWAY_URL_MAP[hostname] ?? "ws://localhost:18789"
+}
 
 interface AppGatewayProviderProps {
   children: ReactNode
@@ -42,9 +64,11 @@ export function GatewayProvider({ children }: AppGatewayProviderProps) {
     url: string | null
     token: string | null
   }>({ url: null, token: null })
+  const [autoDetectedUrl, setAutoDetectedUrl] = useState<string>("ws://localhost:18789")
 
   useEffect(() => {
     setCredentials(getSavedCredentials())
+    setAutoDetectedUrl(getGatewayUrlForHost())
     setMounted(true)
   }, [])
 
@@ -52,7 +76,7 @@ export function GatewayProvider({ children }: AppGatewayProviderProps) {
   if (!mounted) {
     return (
       <BaseGatewayProvider
-        defaultUrl={DEFAULT_GATEWAY_URL}
+        defaultUrl="ws://localhost:18789"
         autoConnect={false}
       >
         {children}
@@ -61,13 +85,22 @@ export function GatewayProvider({ children }: AppGatewayProviderProps) {
   }
 
   const { url: savedUrl, token: savedToken } = credentials
-  const hasSavedCredentials = Boolean(savedUrl)
+
+  // Use saved URL if available, otherwise use auto-detected URL
+  const gatewayUrl = savedUrl ?? autoDetectedUrl
+
+  // Use saved token, or default token for sky64.io domain
+  const isPublicDomain = typeof window !== "undefined" && window.location.hostname === "dashboard.sky64.io"
+  const gatewayToken = savedToken ?? (isPublicDomain ? DEFAULT_TOKEN : undefined)
+
+  // Auto-connect if we have a token (either saved or default for public domain)
+  const shouldAutoConnect = Boolean(gatewayToken)
 
   return (
     <BaseGatewayProvider
-      defaultUrl={savedUrl ?? DEFAULT_GATEWAY_URL}
-      defaultToken={savedToken ?? undefined}
-      autoConnect={hasSavedCredentials}
+      defaultUrl={gatewayUrl}
+      defaultToken={gatewayToken}
+      autoConnect={shouldAutoConnect}
     >
       {children}
     </BaseGatewayProvider>
