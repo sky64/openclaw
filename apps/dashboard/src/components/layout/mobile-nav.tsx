@@ -36,8 +36,10 @@ export function MobileNav({ activeView, onViewChange }: MobileNavProps) {
       <div className="flex items-center justify-around py-2">
         {navItems.map((item) => (
           <button
+            type="button"
             key={item.id}
             onClick={() => onViewChange(item.id)}
+            aria-label={`Navigate to ${item.label}`}
             className={cn(
               "relative flex flex-col items-center gap-1 px-3 py-2 transition-colors",
               activeView === item.id

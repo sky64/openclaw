@@ -96,6 +96,7 @@ export function Shell({
                   <button
                     type="button"
                     onClick={() => setMobileMenuOpen(false)}
+                    aria-label="Close menu"
                     className={cn(
                       "w-8 h-8 rounded-lg flex items-center justify-center",
                       "hover:bg-[var(--surface-2)] transition-colors"

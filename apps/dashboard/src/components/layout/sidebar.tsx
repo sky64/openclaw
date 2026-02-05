@@ -92,6 +92,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={() => onCollapsedChange?.(!collapsed)}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           className={cn(
             "w-6 h-6 rounded flex items-center justify-center",
             "hover:bg-[var(--surface-2)] transition-colors",
