@@ -9,6 +9,7 @@ import { CLIView } from "@/components/cli"
 import { ProcessesView } from "@/components/processes"
 import { SkillsView } from "@/components/skills"
 import { ConfigView } from "@/components/config"
+import { DocumentsView } from "@/components/documents"
 import { useGateway } from "@/lib/gateway/hooks"
 
 /**
@@ -69,6 +70,8 @@ export default function Home() {
         return <SkillsView />
       case "config":
         return <ConfigView />
+      case "documents":
+        return <DocumentsView />
       default:
         return <PlaceholderView name="Unknown" />
     }
