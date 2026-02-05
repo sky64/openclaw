@@ -67,7 +67,6 @@ export function Shell({
           onCollapsedChange={setSidebarCollapsed}
           connected={connected}
           version={version}
-          uptime={uptime}
         />
       </div>
 
