@@ -1,0 +1,14 @@
+[Unit]
+Description=Cloudflare Tunnel sky64
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/home/kennethdixon/.local/bin/cloudflared tunnel run sky64
+Restart=on-failure
+RestartSec=5
+Environment=HOME=/home/kennethdixon
+
+[Install]
+WantedBy=default.target

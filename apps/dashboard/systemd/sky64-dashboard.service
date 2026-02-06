@@ -1,0 +1,16 @@
+[Unit]
+Description=Sky64 Dashboard (Next.js)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/kennethdixon/projects/openclaw/apps/dashboard
+ExecStart=/home/linuxbrew/.linuxbrew/bin/npx next dev --turbopack --port 3001
+Restart=on-failure
+RestartSec=5
+Environment=HOME=/home/kennethdixon
+Environment=PATH=/home/kennethdixon/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/kennethdixon/Library/pnpm:/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=default.target
