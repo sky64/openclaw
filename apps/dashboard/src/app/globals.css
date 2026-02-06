@@ -94,3 +94,189 @@ body {
   background: var(--accent);
   color: var(--accent-foreground);
 }
+
+/* ── Documentation prose styles ── */
+
+.docs-prose {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--foreground);
+}
+
+.docs-prose .docs-heading {
+  font-weight: 600;
+  color: var(--foreground);
+  letter-spacing: -0.01em;
+}
+
+.docs-prose .docs-h2 {
+  font-size: 1.25rem;
+  margin: 2rem 0 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.docs-prose .docs-h3 {
+  font-size: 1.05rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.docs-prose .docs-h4 {
+  font-size: 0.925rem;
+  margin: 1.25rem 0 0.375rem;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.docs-prose .docs-h5 {
+  font-size: 0.875rem;
+  margin: 1rem 0 0.25rem;
+}
+
+.docs-prose .docs-p {
+  margin: 0.5rem 0;
+}
+
+.docs-prose .docs-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 0.15s;
+}
+
+.docs-prose .docs-link:hover {
+  text-decoration-thickness: 2px;
+}
+
+.docs-prose .docs-inline-code {
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--surface-2-border);
+  color: var(--accent);
+}
+
+.docs-prose .docs-code-block {
+  margin: 1rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--surface-2-border);
+  background: var(--surface-1);
+}
+
+.docs-prose .docs-code-lang {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.375rem 0.75rem;
+  color: var(--muted-foreground);
+  border-bottom: 1px solid var(--surface-2-border);
+  background: var(--surface-2);
+}
+
+.docs-prose .docs-code-block pre {
+  margin: 0;
+  padding: 0.875rem 1rem;
+  overflow-x: auto;
+}
+
+.docs-prose .docs-code-block code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--foreground);
+  tab-size: 2;
+}
+
+.docs-prose .docs-list {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+
+.docs-prose .docs-ol {
+  list-style: decimal;
+}
+
+.docs-prose ul.docs-list {
+  list-style: disc;
+}
+
+.docs-prose .docs-li {
+  margin: 0.2rem 0;
+}
+
+.docs-prose .docs-blockquote {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--accent);
+  background: var(--accent);
+  background: rgba(245, 158, 11, 0.05);
+  border-radius: 0 6px 6px 0;
+}
+
+.docs-prose .docs-blockquote p {
+  margin: 0.25rem 0;
+  color: var(--muted-foreground);
+  font-size: 0.84rem;
+}
+
+.docs-prose .docs-table-wrap {
+  margin: 1rem 0;
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--surface-2-border);
+}
+
+.docs-prose .docs-table {
+  width: 100%;
+  font-size: 0.8rem;
+  border-collapse: collapse;
+}
+
+.docs-prose .docs-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--surface-2-border);
+}
+
+.docs-prose .docs-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.docs-prose .docs-table tr:last-child td {
+  border-bottom: none;
+}
+
+.docs-prose .docs-hr {
+  margin: 1.5rem 0;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+/* TOC sidebar */
+.docs-toc {
+  scrollbar-width: thin;
+}
+
+.docs-toc::-webkit-scrollbar {
+  width: 4px;
+}
+
+.docs-toc::-webkit-scrollbar-thumb {
+  background: var(--surface-3-border);
+  border-radius: 2px;
+}
