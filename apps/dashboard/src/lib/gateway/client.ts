@@ -503,4 +503,13 @@ export class GatewayClient {
       "models.list"
     )
   }
+
+  /**
+   * List available bot commands (native + skill).
+   */
+  async commandsList(): Promise<{ commands: Array<{ name: string; description: string }> }> {
+    return this.request<{ commands: Array<{ name: string; description: string }> }>(
+      "commands.list"
+    )
+  }
 }

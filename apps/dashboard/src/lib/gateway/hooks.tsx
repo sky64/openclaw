@@ -121,7 +121,7 @@ export function useChat(sessionKey?: string): UseChatReturn {
           ...msg,
           content: typeof msg.content === 'string'
             ? msg.content
-            : extractMessageContent(msg.content),
+            : extractMessageContent(msg),
         }))
         setMessages(normalizedHistory)
       })
@@ -280,6 +280,8 @@ function extractMessageContent(message: unknown): string {
   }
   if (message && typeof message === "object") {
     const msg = message as Record<string, unknown>
+    
+    // Handle string content directly
     if (typeof msg.content === "string") {
       return msg.content
     }
@@ -289,7 +291,21 @@ function extractMessageContent(message: unknown): string {
     if (typeof msg.delta === "string") {
       return msg.delta
     }
-    if (msg.content && typeof msg.content === "object") {
+    
+    // Handle Claude-style content array: [{ type: "text", text: "..." }]
+    if (Array.isArray(msg.content)) {
+      const textParts = msg.content
+        .filter((part): part is { type: string; text: string } => 
+          part && typeof part === "object" && part.type === "text" && typeof part.text === "string"
+        )
+        .map((part) => part.text)
+      if (textParts.length > 0) {
+        return textParts.join("\n")
+      }
+    }
+    
+    // Handle nested content object
+    if (msg.content && typeof msg.content === "object" && !Array.isArray(msg.content)) {
       const content = msg.content as Record<string, unknown>
       if (typeof content.text === "string") {
         return content.text
@@ -297,6 +313,45 @@ function extractMessageContent(message: unknown): string {
     }
   }
   return ""
+}
+
+// Commands hook
+
+interface UseCommandsReturn {
+  commands: Array<{ name: string; description: string }>
+  loading: boolean
+}
+
+/**
+ * Hook to fetch available bot commands from the gateway.
+ * Returns the combined list of native + skill commands.
+ */
+export function useCommands(): UseCommandsReturn {
+  const { client, connected } = useGateway()
+  const [commands, setCommands] = useState<Array<{ name: string; description: string }>>([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (!client || !connected) {
+      setCommands([])
+      return
+    }
+
+    setLoading(true)
+    client
+      .commandsList()
+      .then((result) => {
+        setCommands(result.commands ?? [])
+      })
+      .catch(() => {
+        setCommands([])
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [client, connected])
+
+  return { commands, loading }
 }
 
 // Provider component

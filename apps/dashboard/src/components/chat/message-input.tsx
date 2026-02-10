@@ -1,10 +1,12 @@
 "use client"
 
-import { useState, useRef, useCallback, type KeyboardEvent } from "react"
+import { useState, useRef, useCallback, useMemo, type KeyboardEvent } from "react"
 import { motion } from "framer-motion"
 import { PaperPlaneRight, Stop } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui"
+import { SlashCommandPopup, type SlashCommand } from "./slash-command-popup"
+import { useCommands } from "@/lib/gateway/hooks"
 
 export interface MessageInputProps {
   onSend: (message: string) => void
@@ -29,7 +31,23 @@ export function MessageInput({
   className,
 }: MessageInputProps) {
   const [value, setValue] = useState("")
+  const [showSlashPopup, setShowSlashPopup] = useState(false)
+  const [slashFilter, setSlashFilter] = useState("")
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // Get real commands from the gateway
+  const { commands: slashCommands } = useCommands()
+
+  // Filter commands based on current input
+  const filteredCommands = useMemo(() => {
+    const search = slashFilter.toLowerCase()
+    return slashCommands.filter(
+      (cmd) =>
+        cmd.name.toLowerCase().includes(search) ||
+        cmd.description.toLowerCase().includes(search)
+    )
+  }, [slashCommands, slashFilter])
 
   // Auto-resize textarea based on content
   const adjustHeight = useCallback(() => {
@@ -42,8 +60,25 @@ export function MessageInput({
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setValue(e.target.value)
+    const newValue = e.target.value
+    setValue(newValue)
     adjustHeight()
+
+    // Check if user is typing a slash command
+    if (newValue.startsWith("/")) {
+      const afterSlash = newValue.slice(1)
+      // Only show popup if there's no space (still typing the command name)
+      if (!afterSlash.includes(" ")) {
+        setSlashFilter(afterSlash)
+        setShowSlashPopup(true)
+        setSelectedIndex(0)
+      } else {
+        setShowSlashPopup(false)
+      }
+    } else {
+      setShowSlashPopup(false)
+      setSlashFilter("")
+    }
   }
 
   const handleSend = useCallback(() => {
@@ -62,6 +97,45 @@ export function MessageInput({
   }, [value, disabled, streaming, onSend])
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    // Handle slash command popup navigation
+    if (showSlashPopup && filteredCommands.length > 0) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault()
+        setSelectedIndex((prev) =>
+          prev < filteredCommands.length - 1 ? prev + 1 : 0
+        )
+        return
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault()
+        setSelectedIndex((prev) =>
+          prev > 0 ? prev - 1 : filteredCommands.length - 1
+        )
+        return
+      }
+      if (e.key === "Enter") {
+        e.preventDefault()
+        const selectedCommand = filteredCommands[selectedIndex]
+        if (selectedCommand) {
+          handleSlashSelect(selectedCommand)
+        }
+        return
+      }
+      if (e.key === "Escape") {
+        e.preventDefault()
+        setShowSlashPopup(false)
+        return
+      }
+      if (e.key === "Tab") {
+        e.preventDefault()
+        const selectedCommand = filteredCommands[selectedIndex]
+        if (selectedCommand) {
+          handleSlashSelect(selectedCommand)
+        }
+        return
+      }
+    }
+
     // Enter to send, Shift+Enter for newline
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
@@ -73,6 +147,20 @@ export function MessageInput({
     onStop?.()
   }, [onStop])
 
+  const handleSlashSelect = useCallback((command: SlashCommand) => {
+    // Replace the current slash input with the selected command
+    setValue(`/${command.name} `)
+    setShowSlashPopup(false)
+    setSlashFilter("")
+    setSelectedIndex(0)
+    // Focus back on the textarea
+    textareaRef.current?.focus()
+  }, [])
+
+  const handleSlashClose = useCallback(() => {
+    setShowSlashPopup(false)
+  }, [])
+
   return (
     <div
       className={cn(
@@ -81,7 +169,17 @@ export function MessageInput({
         className
       )}
     >
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto relative">
+        {/* Slash command popup */}
+        <SlashCommandPopup
+          isOpen={showSlashPopup}
+          commands={slashCommands}
+          filter={slashFilter}
+          selectedIndex={selectedIndex}
+          onSelect={handleSlashSelect}
+          onClose={handleSlashClose}
+        />
+
         <motion.div
           className={cn(
             "flex items-end gap-2 p-2",
