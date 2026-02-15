@@ -29,9 +29,53 @@ import {
 } from "./hooks.js";
 import { handleOpenAiHttpRequest } from "./openai-http.js";
 import { handleOpenResponsesHttpRequest } from "./openresponses-http.js";
+import { createRateLimiter } from "./rate-limit.js";
 import { handleToolsInvokeHttpRequest } from "./tools-invoke-http.js";
 
 type SubsystemLogger = ReturnType<typeof createSubsystemLogger>;
+
+// Security headers applied to every HTTP response (not WebSocket upgrades).
+function setSecurityHeaders(req: IncomingMessage, res: ServerResponse): void {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  // X-XSS-Protection: 0 disables the legacy XSS auditor; CSP is the preferred protection.
+  res.setHeader("X-XSS-Protection", "0");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'none'",
+  );
+
+  // HSTS only when the connection is TLS-terminated at this server.
+  const socket = req.socket as { encrypted?: boolean };
+  if (socket.encrypted) {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
+}
+
+// Same-origin CORS check: only reflect the Origin header when it matches the Host header.
+function isSameOrigin(req: IncomingMessage): boolean {
+  const origin = req.headers.origin;
+  if (!origin) {
+    return false;
+  }
+  try {
+    const originHost = new URL(origin).host;
+    const hostHeader = req.headers.host;
+    return !!hostHeader && originHost === hostHeader;
+  } catch {
+    return false;
+  }
+}
+
+function setCorsHeaders(req: IncomingMessage, res: ServerResponse): void {
+  if (isSameOrigin(req)) {
+    res.setHeader("Access-Control-Allow-Origin", req.headers.origin!);
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, X-OpenClaw-Token");
+    res.setHeader("Access-Control-Max-Age", "86400");
+  }
+}
 
 type HookDispatchers = {
   dispatchWakeHook: (value: { text: string; mode: "now" | "next-heartbeat" }) => void;
@@ -78,19 +122,12 @@ export function createHooksRequestHandler(
       return false;
     }
 
-    const { token, fromQuery } = extractHookToken(req, url);
+    const { token } = extractHookToken(req, url);
     if (!token || token !== hooksConfig.token) {
       res.statusCode = 401;
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.end("Unauthorized");
       return true;
-    }
-    if (fromQuery) {
-      logHooks.warn(
-        "Hook token provided via query parameter is deprecated for security reasons. " +
-          "Tokens in URLs appear in logs, browser history, and referrer headers. " +
-          "Use Authorization: Bearer <token> or X-OpenClaw-Token header instead.",
-      );
     }
 
     if (req.method !== "POST") {
@@ -225,6 +262,7 @@ export function createGatewayHttpServer(opts: {
     handlePluginRequest,
     resolvedAuth,
   } = opts;
+  const rateLimiter = createRateLimiter();
   const httpServer: HttpServer = opts.tlsOptions
     ? createHttpsServer(opts.tlsOptions, (req, res) => {
         void handleRequest(req, res);
@@ -236,6 +274,26 @@ export function createGatewayHttpServer(opts: {
   async function handleRequest(req: IncomingMessage, res: ServerResponse) {
     // Don't interfere with WebSocket upgrades; ws handles the 'upgrade' event.
     if (String(req.headers.upgrade ?? "").toLowerCase() === "websocket") {
+      return;
+    }
+
+    setSecurityHeaders(req, res);
+    setCorsHeaders(req, res);
+
+    if (req.method === "OPTIONS") {
+      res.statusCode = 204;
+      res.end();
+      return;
+    }
+
+    const clientIp = req.socket.remoteAddress ?? "unknown";
+    const rateLimitResult = rateLimiter.check(clientIp);
+    if (!rateLimitResult.allowed) {
+      const retryAfterSec = Math.ceil(rateLimitResult.retryAfterMs / 1000);
+      res.setHeader("Retry-After", String(retryAfterSec));
+      res.statusCode = 429;
+      res.setHeader("Content-Type", "text/plain; charset=utf-8");
+      res.end("Too Many Requests");
       return;
     }
 
