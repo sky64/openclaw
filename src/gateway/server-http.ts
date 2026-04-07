@@ -29,8 +29,8 @@ import {
 } from "./hooks.js";
 import { handleOpenAiHttpRequest } from "./openai-http.js";
 import { handleOpenResponsesHttpRequest } from "./openresponses-http.js";
-import { createRateLimiter } from "./rate-limit.js";
 import { handleToolsInvokeHttpRequest } from "./tools-invoke-http.js";
+import { createRateLimiter } from "./rate-limit.js";
 
 type SubsystemLogger = ReturnType<typeof createSubsystemLogger>;
 

@@ -34,6 +34,8 @@ tmp
 # build artifacts
 dist
 **/dist
+# but include the pre-built rcr plugin dist (not published to npm)
+!rcr-plugin/dist
 apps/macos/.build
 apps/ios/build
 **/*.trace
