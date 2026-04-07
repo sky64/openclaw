@@ -14,6 +14,7 @@ import { handleA2uiHttpRequest } from "../canvas-host/a2ui.js";
 import { loadConfig } from "../config/config.js";
 import { handleSlackHttpRequest } from "../slack/http/index.js";
 import { handleControlUiAvatarRequest, handleControlUiHttpRequest } from "./control-ui.js";
+import { handleDashboardHttpRequest } from "./dashboard-ui.js";
 import { applyHookMappings } from "./hooks-mapping.js";
 import {
   extractHookToken,
@@ -29,8 +30,8 @@ import {
 } from "./hooks.js";
 import { handleOpenAiHttpRequest } from "./openai-http.js";
 import { handleOpenResponsesHttpRequest } from "./openresponses-http.js";
-import { handleToolsInvokeHttpRequest } from "./tools-invoke-http.js";
 import { createRateLimiter } from "./rate-limit.js";
+import { handleToolsInvokeHttpRequest } from "./tools-invoke-http.js";
 
 type SubsystemLogger = ReturnType<typeof createSubsystemLogger>;
 
@@ -345,6 +346,9 @@ export function createGatewayHttpServer(opts: {
         if (await canvasHost.handleHttpRequest(req, res)) {
           return;
         }
+      }
+      if (handleDashboardHttpRequest(req, res)) {
+        return;
       }
       if (controlUiEnabled) {
         if (
