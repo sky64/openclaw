@@ -70,95 +70,26 @@ declare class RouterError extends Error {
 }
 
 /**
- * @rustyclaw/rcr — OpenClaw plugin
+ * @rustyclaw/rcr — OpenClaw provider plugin
  *
- * Routes OpenClaw LLM requests
- * through RustyClawRouter with Solana-native x402 USDC micropayments.
+ * Registers RustyClawRouter as an OpenClaw LLM provider by starting a local
+ * HTTP proxy that handles x402 Solana micropayments transparently.
  *
- * Installation (on tenant VPS):
- *   openclaw plugins install @rustyclaw/rcr
- *
- * Required env vars (already present on all Telsi tenant VPSes):
- *   LLM_ROUTER_API_URL     — RustyClawRouter gateway base URL
+ * Required env vars:
+ *   LLM_ROUTER_API_URL     — RustyClawRouter gateway URL
  *   LLM_ROUTER_WALLET_KEY  — Base58 Solana private key for x402 payments
- *
- * Optional env vars:
- *   SOLANA_RPC_URL         — Solana RPC endpoint for on-chain signing
- *                            (required when @solana/web3.js is installed)
- *
- * Usage as a standalone client:
- *   import { createRouter } from '@rustyclaw/rcr';
- *
- *   const router = createRouter();
- *   const response = await router.chat([{ role: 'user', content: 'Hello!' }]);
- *   console.log(response.choices[0].message.content);
  */
 
 /**
- * OpenClaw plugin descriptor.
- *
- * OpenClaw loads plugins via this default export and calls `intercept` for
- * every outbound LLM request. Returning a response short-circuits the default
- * provider, routing the call through RustyClawRouter instead.
+ * OpenClaw plugin register function.
+ * Called by OpenClaw's plugin loader when the plugin is enabled.
+ * Returns the proxy port on success, or null if config is missing.
  */
-interface OpenClawPlugin {
-    name: string;
-    version: string;
-    description: string;
-    /**
-     * Intercept an outbound LLM request.
-     * Return a ChatResponse to short-circuit the default provider.
-     * Return null to pass the request through unchanged.
-     */
-    intercept: (request: ChatRequest) => Promise<ChatResponse | null>;
-    /**
-     * Intercept an outbound streaming LLM request.
-     * Return a Response (SSE stream) to short-circuit the default provider.
-     * Return null to pass the request through unchanged.
-     */
-    interceptStream: (request: ChatRequest) => Promise<Response | null>;
-}
-/**
- * Create the RcrClient OpenClaw plugin.
- *
- * @param overrides - Optional config overrides (useful for testing).
- */
-declare function createPlugin(overrides?: Partial<RcrConfig>): OpenClawPlugin;
-/**
- * High-level router client with a clean async API.
- * Useful when importing the plugin as a library rather than via OpenClaw.
- */
-declare class RcrClient {
-    private readonly config;
-    constructor(overrides?: Partial<RcrConfig>);
-    /**
-     * Send a non-streaming chat completion through RustyClawRouter.
-     *
-     * @param messages     - Conversation messages
-     * @param model        - Model ID (defaults to config.defaultModel, i.e. "auto")
-     * @param options      - Optional max_tokens / temperature overrides
-     */
-    chat(messages: ChatMessage[], model?: string, options?: {
-        max_tokens?: number;
-        temperature?: number;
-        top_p?: number;
-    }): Promise<ChatResponse>;
-    /**
-     * Send a streaming chat completion through RustyClawRouter.
-     * Returns the raw SSE Response — iterate with a ReadableStream reader.
-     */
-    chatStream(messages: ChatMessage[], model?: string, options?: {
-        max_tokens?: number;
-        temperature?: number;
-        top_p?: number;
-    }): Promise<Response>;
-    /** The resolved configuration (gateway URL, default model). */
-    getConfig(): Readonly<RcrConfig>;
-}
-/**
- * Create an RCR client using environment variables.
- * Shorthand for `new RcrClient()`.
- */
-declare function createRouter(overrides?: Partial<RcrConfig>): RcrClient;
+declare function register(api: any): Promise<{
+    port: number;
+} | null>;
+declare const _default: {
+    register: typeof register;
+};
 
-export { type ChatMessage, type ChatRequest, type ChatResponse, ConfigError, type OpenClawPlugin, PaymentError, RcrClient, type RcrConfig, RouterError, createPlugin, createRouter, createPlugin as default };
+export { type ChatMessage, type ChatRequest, type ChatResponse, ConfigError, PaymentError, type RcrConfig, RouterError, _default as default, register };

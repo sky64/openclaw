@@ -1,23 +1,6 @@
 {
   "id": "rcr",
-  "name": "RustyClawRouter",
-  "description": "Solana-native LLM routing with x402 micropayments via BlockRun",
-  "version": "0.1.0",
-  "configSchema": {
-    "type": "object",
-    "properties": {
-      "gatewayUrl": {
-        "type": "string",
-        "description": "RustyClawRouter gateway URL (overrides LLM_ROUTER_API_URL env var)"
-      },
-      "walletKey": {
-        "type": "string",
-        "description": "Base58-encoded Solana private key for x402 payments (overrides LLM_ROUTER_WALLET_KEY env var)"
-      },
-      "defaultModel": {
-        "type": "string",
-        "description": "Default model ID to use when none is specified (default: auto)"
-      }
-    }
-  }
+  "providers": ["rcr"],
+  "providerAuthEnvVars": { "rcr": ["LLM_ROUTER_WALLET_KEY"] },
+  "configSchema": { "type": "object", "properties": {} }
 }
