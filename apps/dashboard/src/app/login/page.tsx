@@ -1,26 +1,35 @@
 "use client"
 
-import { useRef } from "react"
+import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { ThemeToggle } from "@/components/ui"
 import { HeroSection, LoginForm } from "@/components/login"
+import { useAuth } from "@/lib/auth"
 
 export default function LoginPage() {
   const router = useRouter()
-  const formRef = useRef<HTMLDivElement>(null)
+  const { isAuthenticated, isLoading, login } = useAuth()
 
-  const handleLogin = async (email: string, password: string) => {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 800))
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace("/")
+    }
+  }, [isLoading, isAuthenticated, router])
 
-    // Hardcoded password for now
-    const SECRET = "lobster"
+  const handleLogin = async (_email: string, password: string) => {
+    const response = await fetch("/api/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password }),
+    })
 
-    if (password !== SECRET) {
-      throw new Error("Invalid password")
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      throw new Error((data as { error?: string }).error ?? "Invalid password")
     }
 
-    // Success - redirect to dashboard
+    login()
+
     setTimeout(() => {
       router.push("/")
     }, 500)
@@ -28,24 +37,19 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-background">
-      {/* Theme Toggle - Fixed position */}
+      {/* Theme Toggle */}
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>
 
-      {/* Hero Section - Hidden on mobile, 60% on desktop */}
+      {/* Hero Section - Desktop only */}
       <div className="hidden lg:flex lg:w-[60%] min-h-screen">
-        <HeroSection className="flex-1" formRef={formRef} />
+        <HeroSection className="flex-1" />
       </div>
 
-      {/* Mobile Hero - Compact version */}
-      <div className="lg:hidden relative h-[40vh] min-h-[300px] bg-gradient-to-b from-amber-500/5 to-transparent">
-        <HeroSection className="h-full scale-75 origin-center" formRef={formRef} />
-      </div>
-
-      {/* Form Section */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
-        <LoginForm ref={formRef} onSubmit={handleLogin} />
+      {/* Form Section - Centered card on mobile, side panel on desktop */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 min-h-screen lg:min-h-0">
+        <LoginForm onSubmit={handleLogin} />
       </div>
     </div>
   )

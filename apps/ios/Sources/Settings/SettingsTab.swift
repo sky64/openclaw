@@ -211,6 +211,15 @@ struct SettingsTab: View {
                         .foregroundStyle(.secondary)
                 }
 
+                Section("Gemini Live") {
+                    NavigationLink("Gemini Live (Experimental)") {
+                        GeminiLiveView()
+                    }
+                    Text("Real-time voice + vision AI via Gemini. Requires a Google AI API key.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
                 Section("Screen") {
                     Toggle("Prevent Sleep", isOn: self.$preventSleep)
                     Text("Keeps the screen awake while OpenClaw is open.")

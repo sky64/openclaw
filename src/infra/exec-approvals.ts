@@ -1310,6 +1310,86 @@ export function maxAsk(a: ExecAsk, b: ExecAsk): ExecAsk {
 
 export type ExecApprovalDecision = "allow-once" | "allow-always" | "deny";
 
+// --- Elevated-mode safety blocklist ---
+// These patterns catch catastrophically destructive commands that are blocked
+// even when elevated mode is "full". This is a non-configurable safety net.
+
+type BlocklistEntry = {
+  pattern: RegExp;
+  reason: string;
+};
+
+export const ELEVATED_BLOCKLIST_PATTERNS: BlocklistEntry[] = [
+  {
+    // rm -rf / or rm -rf /* (with optional -- before path)
+    pattern: /\brm\s+(-[^\s]*\s+)*-[^\s]*r[^\s]*f[^\s]*\s+(--)?\s*\/(\*|\s|$)/,
+    reason: "recursive delete of root filesystem",
+  },
+  {
+    // rm with separate flags (e.g. rm -r -f /) — requires recursive flag somewhere
+    pattern: /\brm\s+(-[^\s]+\s+)*-[^\s]*[rR][^\s]*\s+(-[^\s]+\s+)*\/(\*|\s|$)/,
+    reason: "recursive delete of root filesystem",
+  },
+  {
+    // dd writing to block devices
+    pattern: /\bdd\s+.*\bof=\/dev\/(sd[a-z]|nvme\d|disk\d|[hv]d[a-z]|xvd[a-z]|mmcblk\d)/,
+    reason: "dd write to block device",
+  },
+  {
+    // mkfs on real devices
+    pattern: /\bmkfs(\.\w+)?\s+.*\/dev\/(sd[a-z]|nvme\d|disk\d|[hv]d[a-z]|xvd[a-z]|mmcblk\d)/,
+    reason: "mkfs on block device",
+  },
+  {
+    // fork bomb: :(){:|:&};: and common variants
+    pattern: /:\(\)\s*\{.*\|.*&\s*\}\s*;?\s*:/,
+    reason: "fork bomb",
+  },
+  {
+    // chmod -R 777 / (recursive world-writable root)
+    pattern: /\bchmod\s+(-[^\s]*\s+)*-[^\s]*R[^\s]*\s+([^\s]+\s+)*777\s+\/(\s|$)/,
+    reason: "recursive chmod 777 on root",
+  },
+  {
+    // chmod -R 777 / variant: 777 before -R
+    pattern: /\bchmod\s+(-[^\s]*\s+)*777\s+(-[^\s]*R[^\s]*\s+)?\/(\s|$)/,
+    reason: "recursive chmod 777 on root",
+  },
+  {
+    // chown -R on root
+    pattern: /\bchown\s+(-[^\s]*\s+)*-[^\s]*R[^\s]*\s+\S+\s+\/(\s|$)/,
+    reason: "recursive chown on root filesystem",
+  },
+  {
+    // Direct device writes: > /dev/sda, etc.
+    pattern: />\s*\/dev\/(sd[a-z]|nvme\d|disk\d|[hv]d[a-z]|xvd[a-z]|mmcblk\d)/,
+    reason: "direct write to block device",
+  },
+  {
+    // mv / somewhere
+    pattern: /\bmv\s+(-[^\s]+\s+)*\/\s/,
+    reason: "moving root filesystem",
+  },
+  {
+    // shutdown, reboot, halt, poweroff
+    pattern: /\b(shutdown|reboot|halt|poweroff)\b/,
+    reason: "system power command",
+  },
+];
+
+export function isDestructiveCommand(command: string): { blocked: boolean; reason: string } {
+  const trimmed = command.trim();
+  if (!trimmed) {
+    return { blocked: false, reason: "" };
+  }
+  for (const entry of ELEVATED_BLOCKLIST_PATTERNS) {
+    if (entry.pattern.test(trimmed)) {
+      return { blocked: true, reason: entry.reason };
+    }
+  }
+  return { blocked: false, reason: "" };
+}
+
 export async function requestExecApprovalViaSocket(params: {
   socketPath: string;
   token: string;

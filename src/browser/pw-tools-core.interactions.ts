@@ -1,4 +1,5 @@
 import type { BrowserFormField } from "./client-actions-core.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
 import {
   ensurePageState,
   getPageForTargetId,
@@ -6,6 +7,10 @@ import {
   restoreRoleRefsForTarget,
 } from "./pw-session.js";
 import { normalizeTimeoutMs, requireRef, toAIFriendlyError } from "./pw-tools-core.shared.js";
+
+const log = createSubsystemLogger("browser").child("evaluate");
+
+export const MAX_EVALUATE_FN_LENGTH = 50_000;
 
 export async function highlightViaPlaywright(opts: {
   cdpUrl: string;
@@ -226,6 +231,14 @@ export async function evaluateViaPlaywright(opts: {
   if (!fnText) {
     throw new Error("function is required");
   }
+  if (fnText.length > MAX_EVALUATE_FN_LENGTH) {
+    throw new Error(
+      `evaluate function exceeds maximum length (${fnText.length} > ${MAX_EVALUATE_FN_LENGTH})`,
+    );
+  }
+  log.info(
+    `browser evaluate: length=${fnText.length} ref=${opts.ref ?? "none"} targetId=${opts.targetId ?? "default"}`,
+  );
   const page = await getPageForTargetId(opts);
   ensurePageState(page);
   restoreRoleRefsForTarget({ cdpUrl: opts.cdpUrl, targetId: opts.targetId, page });

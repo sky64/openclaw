@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import { Shell, type ViewId } from "@/components/layout"
 import { ConnectionDialog } from "@/components/dialogs"
 import { CommandPalette } from "@/components/command-palette"
@@ -11,6 +12,7 @@ import { SkillsView } from "@/components/skills"
 import { ConfigView } from "@/components/config"
 import { DocumentsView } from "@/components/documents"
 import { useGateway } from "@/lib/gateway/hooks"
+import { useAuth } from "@/lib/auth"
 
 /**
  * Placeholder view component for development.
@@ -30,6 +32,8 @@ function PlaceholderView({ name }: { name: string }) {
 }
 
 export default function Home() {
+  const router = useRouter()
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
   const { connected } = useGateway()
 
   // Active view state (lifted up to support command palette navigation)
@@ -40,6 +44,13 @@ export default function Home() {
 
   // Connection dialog state - show after 500ms delay when not connected
   const [connectionDialogOpen, setConnectionDialogOpen] = useState(false)
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.replace("/login")
+    }
+  }, [authLoading, isAuthenticated, router])
 
   useEffect(() => {
     if (!connected) {
@@ -58,7 +69,7 @@ export default function Home() {
     setActiveView(view as ViewId)
   }, [])
 
-  const renderView = (view: ViewId) => {
+  const renderView = useCallback((view: ViewId) => {
     switch (view) {
       case "chat":
         return <ChatView />
@@ -75,6 +86,11 @@ export default function Home() {
       default:
         return <PlaceholderView name="Unknown" />
     }
+  }, [])
+
+  // Show nothing while checking auth
+  if (authLoading || !isAuthenticated) {
+    return null
   }
 
   return (

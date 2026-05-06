@@ -11,6 +11,7 @@ import {
   type ExecApprovalsFile,
   addAllowlistEntry,
   evaluateShellAllowlist,
+  isDestructiveCommand,
   maxAsk,
   minSecurity,
   requiresExecApproval,
@@ -897,6 +898,15 @@ export function createExecTool(
       const bypassApprovals = elevatedRequested && elevatedMode === "full";
       if (bypassApprovals) {
         ask = "off";
+      }
+
+      if (bypassApprovals) {
+        const destructive = isDestructiveCommand(params.command);
+        if (destructive.blocked) {
+          throw new Error(
+            `exec blocked: ${destructive.reason} (blocked even in elevated mode for safety)`,
+          );
+        }
       }
 
       const sandbox = host === "sandbox" ? defaults?.sandbox : undefined;

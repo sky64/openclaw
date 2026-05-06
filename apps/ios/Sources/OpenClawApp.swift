@@ -1,3 +1,4 @@
+import MWDATCore
 import SwiftUI
 
 @main
@@ -8,6 +9,11 @@ struct OpenClawApp: App {
 
     init() {
         GatewaySettingsStore.bootstrapPersistence()
+        do {
+            try Wearables.configure()
+        } catch {
+            print("Meta Wearables DAT SDK init failed: \(error) — glasses features unavailable")
+        }
         let appModel = NodeAppModel()
         _appModel = State(initialValue: appModel)
         _gatewayController = State(initialValue: GatewayConnectionController(appModel: appModel))

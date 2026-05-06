@@ -14,6 +14,9 @@ packages:
     path: ../shared/OpenClawKit
   Swabble:
     path: ../../Swabble
+  MetaWearablesDAT:
+    url: https://github.com/facebook/meta-wearables-dat-ios
+    exactVersion: "0.4.0"
 
 schemes:
   OpenClaw:
@@ -39,6 +42,10 @@ targets:
         product: OpenClawProtocol
       - package: Swabble
         product: SwabbleKit
+      - package: MetaWearablesDAT
+        product: MWDATCore
+      - package: MetaWearablesDAT
+        product: MWDATCamera
       - sdk: AppIntents.framework
     preBuildScripts:
       - name: SwiftFormat (lint)
@@ -93,10 +100,11 @@ targets:
           NSAllowsArbitraryLoadsInWebContent: true
         NSBonjourServices:
           - _openclaw-gw._tcp
-        NSCameraUsageDescription: OpenClaw can capture photos or short video clips when requested via the gateway.
+        NSBluetoothAlwaysUsageDescription: OpenClaw uses Bluetooth to connect to Meta Ray-Ban smart glasses.
+        NSCameraUsageDescription: OpenClaw can capture photos or short video clips via the gateway or stream video from smart glasses.
         NSLocationWhenInUseUsageDescription: OpenClaw uses your location when you allow location sharing.
         NSLocationAlwaysAndWhenInUseUsageDescription: OpenClaw can share your location in the background when you enable Always.
-        NSMicrophoneUsageDescription: OpenClaw needs microphone access for voice wake.
+        NSMicrophoneUsageDescription: OpenClaw needs microphone access for voice wake and Gemini Live conversations.
         NSSpeechRecognitionUsageDescription: OpenClaw uses on-device speech recognition for voice wake.
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait

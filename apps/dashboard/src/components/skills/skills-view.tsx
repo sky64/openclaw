@@ -5,66 +5,13 @@ import { motion, AnimatePresence } from "framer-motion"
 import { List, MagnifyingGlass, Sparkle } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
-import { SkillCard, type Skill } from "./skill-card"
+import { SkillCard } from "./skill-card"
+import { SKILLS } from "@/lib/skills"
+import type { Skill } from "@/lib/skills"
 
 export interface SkillsViewProps {
   className?: string
 }
-
-/**
- * Mock skills data for development.
- * Will be replaced with real skills from the gateway.
- */
-const MOCK_SKILLS: Skill[] = [
-  {
-    name: "commit",
-    description: "Create a git commit with a well-formatted message",
-    category: "git",
-    invocable: true,
-  },
-  {
-    name: "review-pr",
-    description: "Review a GitHub pull request and provide feedback",
-    category: "git",
-    invocable: true,
-  },
-  {
-    name: "brainstorming",
-    description: "Explore user intent, requirements and design before implementation",
-    category: "planning",
-    invocable: true,
-  },
-  {
-    name: "writing-plans",
-    description: "Write comprehensive implementation plans for multi-step tasks",
-    category: "planning",
-    invocable: true,
-  },
-  {
-    name: "test-driven-development",
-    description: "Implement features using TDD methodology",
-    category: "development",
-    invocable: true,
-  },
-  {
-    name: "systematic-debugging",
-    description: "Debug issues methodically with hypothesis testing",
-    category: "development",
-    invocable: true,
-  },
-  {
-    name: "verification-before-completion",
-    description: "Run verification commands before claiming work is complete",
-    category: "quality",
-    invocable: true,
-  },
-  {
-    name: "requesting-code-review",
-    description: "Request code review when completing major features",
-    category: "quality",
-    invocable: true,
-  },
-]
 
 /**
  * Main skills view component.
@@ -76,11 +23,11 @@ export function SkillsView({ className }: SkillsViewProps) {
   // Filter skills based on search query
   const filteredSkills = useMemo(() => {
     if (!searchQuery.trim()) {
-      return MOCK_SKILLS
+      return SKILLS
     }
 
     const query = searchQuery.toLowerCase()
-    return MOCK_SKILLS.filter(
+    return SKILLS.filter(
       (skill) =>
         skill.name.toLowerCase().includes(query) ||
         skill.description.toLowerCase().includes(query) ||
@@ -98,7 +45,7 @@ export function SkillsView({ className }: SkillsViewProps) {
     <div className={cn("h-full flex flex-col", className)}>
       <SkillsHeader
         skillCount={filteredSkills.length}
-        totalCount={MOCK_SKILLS.length}
+        totalCount={SKILLS.length}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
       />

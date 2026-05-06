@@ -108,12 +108,23 @@ export interface ChannelsStatusResult {
 
 // Chat types
 
+export interface InlineButton {
+  text: string
+  callback_data: string
+}
+
 export interface ChatMessage {
   id: string
   role: "user" | "assistant" | "system"
   content: string
   timestamp: number
   attachments?: ChatAttachment[]
+  buttons?: InlineButton[][]
+  replyTo?: {
+    id: string
+    content: string
+    role: string
+  }
 }
 
 export interface ChatAttachment {

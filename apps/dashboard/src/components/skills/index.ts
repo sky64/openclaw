@@ -1,2 +1,3 @@
-export { SkillCard, type SkillCardProps, type Skill } from "./skill-card"
+export { SkillCard, type SkillCardProps } from "./skill-card"
 export { SkillsView, type SkillsViewProps } from "./skills-view"
+export { type Skill, SKILLS, getInvocableSkills } from "@/lib/skills"

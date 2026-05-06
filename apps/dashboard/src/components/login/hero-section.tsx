@@ -2,16 +2,12 @@
 
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { LobsterEyes } from "./lobster-eyes"
-import { LobsterClaw } from "./lobster-claw"
-import { FloatingParticles } from "./floating-particles"
 
 interface HeroSectionProps {
   className?: string
-  formRef?: React.RefObject<HTMLElement | null>
 }
 
-export function HeroSection({ className, formRef }: HeroSectionProps) {
+export function HeroSection({ className }: HeroSectionProps) {
   return (
     <div
       className={cn(
@@ -22,7 +18,7 @@ export function HeroSection({ className, formRef }: HeroSectionProps) {
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-amber-600/10" />
 
-      {/* Subtle grid pattern - dark mode only */}
+      {/* Subtle grid pattern */}
       <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -40,31 +36,18 @@ export function HeroSection({ className, formRef }: HeroSectionProps) {
         </svg>
       </div>
 
-      {/* Floating particles */}
-      <FloatingParticles count={15} />
-
-      {/* Eyes - positioned at top */}
-      <div className="absolute top-[10%] left-1/2 -translate-x-1/2">
-        <LobsterEyes trackTarget={formRef} />
-      </div>
-
-      {/* Claw */}
-      <div className="relative z-10 mt-32">
-        <LobsterClaw size={180} />
-      </div>
-
       {/* Tagline */}
       <motion.div
-        className="relative z-10 mt-12 text-center"
+        className="relative z-10 text-center px-8"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2, duration: 0.6 }}
+        transition={{ delay: 0.3, duration: 0.6 }}
       >
         <motion.h2
           className="text-4xl md:text-5xl font-bold tracking-tight"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.4 }}
+          transition={{ delay: 0.5 }}
         >
           <span className="text-foreground">Your AI.</span>{" "}
           <span className="text-amber-500">Unleashed.</span>
@@ -75,7 +58,7 @@ export function HeroSection({ className, formRef }: HeroSectionProps) {
           className="mt-8 flex flex-wrap justify-center gap-4 text-sm text-muted-foreground"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.8 }}
+          transition={{ delay: 0.8 }}
         >
           {["Multi-channel", "Real-time", "Extensible"].map((feature, i) => (
             <motion.span
@@ -83,7 +66,7 @@ export function HeroSection({ className, formRef }: HeroSectionProps) {
               className="flex items-center gap-2"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 2 + i * 0.1 }}
+              transition={{ delay: 1 + i * 0.1 }}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
               {feature}

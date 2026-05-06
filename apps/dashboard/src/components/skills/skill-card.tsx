@@ -7,16 +7,7 @@ import { cn } from "@/lib/utils"
 import { Card, CardHeader, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-
-/**
- * Skill data structure representing a skill/command.
- */
-export interface Skill {
-  name: string
-  description: string
-  category?: string
-  invocable?: boolean
-}
+import type { Skill } from "@/lib/skills"
 
 export interface SkillCardProps {
   skill: Skill

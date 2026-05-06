@@ -7,6 +7,7 @@ import {
   analyzeShellCommand,
   evaluateExecAllowlist,
   evaluateShellAllowlist,
+  isDestructiveCommand,
   isSafeBinUsage,
   matchAllowlist,
   maxAsk,
@@ -509,5 +510,98 @@ describe("exec approvals default agent migration", () => {
     expect(resolved.agent.ask).toBe("always");
     expect(resolved.allowlist.map((entry) => entry.pattern)).toEqual(["/bin/main", "/bin/legacy"]);
     expect(resolved.file.agents?.default).toBeUndefined();
+  });
+});
+
+describe("isDestructiveCommand (elevated-mode blocklist)", () => {
+  it("blocks rm -rf /", () => {
+    expect(isDestructiveCommand("rm -rf /").blocked).toBe(true);
+    expect(isDestructiveCommand("rm -rf /*").blocked).toBe(true);
+    expect(isDestructiveCommand("rm -rf / --no-preserve-root").blocked).toBe(true);
+    expect(isDestructiveCommand("rm -r -f /").blocked).toBe(true);
+  });
+
+  it("does NOT block rm -rf on safe paths", () => {
+    expect(isDestructiveCommand("rm -rf /tmp/cache").blocked).toBe(false);
+    expect(isDestructiveCommand("rm -rf ./build").blocked).toBe(false);
+    expect(isDestructiveCommand("rm -rf node_modules").blocked).toBe(false);
+  });
+
+  it("blocks dd writes to block devices", () => {
+    expect(isDestructiveCommand("dd if=/dev/zero of=/dev/sda bs=1M").blocked).toBe(true);
+    expect(isDestructiveCommand("dd if=image.iso of=/dev/nvme0").blocked).toBe(true);
+    expect(isDestructiveCommand("dd if=/dev/urandom of=/dev/disk0").blocked).toBe(true);
+  });
+
+  it("does NOT block dd to files", () => {
+    expect(isDestructiveCommand("dd if=/dev/zero of=./test.img bs=1M count=10").blocked).toBe(
+      false,
+    );
+  });
+
+  it("blocks mkfs on block devices", () => {
+    expect(isDestructiveCommand("mkfs.ext4 /dev/sda1").blocked).toBe(true);
+    expect(isDestructiveCommand("mkfs -t ext4 /dev/nvme0").blocked).toBe(true);
+  });
+
+  it("blocks fork bombs", () => {
+    expect(isDestructiveCommand(":(){ :|:& };:").blocked).toBe(true);
+  });
+
+  it("blocks chmod -R 777 /", () => {
+    expect(isDestructiveCommand("chmod -R 777 /").blocked).toBe(true);
+    expect(isDestructiveCommand("chmod 777 /").blocked).toBe(true);
+  });
+
+  it("does NOT block chmod on safe paths", () => {
+    expect(isDestructiveCommand("chmod -R 777 /tmp/mydir").blocked).toBe(false);
+    expect(isDestructiveCommand("chmod 755 ./script.sh").blocked).toBe(false);
+  });
+
+  it("blocks chown -R on root", () => {
+    expect(isDestructiveCommand("chown -R nobody:nogroup /").blocked).toBe(true);
+  });
+
+  it("blocks direct device writes", () => {
+    expect(isDestructiveCommand("> /dev/sda").blocked).toBe(true);
+    expect(isDestructiveCommand("echo test > /dev/nvme0").blocked).toBe(true);
+  });
+
+  it("blocks mv /", () => {
+    expect(isDestructiveCommand("mv / /tmp/oops").blocked).toBe(true);
+  });
+
+  it("blocks shutdown/reboot/halt/poweroff", () => {
+    expect(isDestructiveCommand("shutdown -h now").blocked).toBe(true);
+    expect(isDestructiveCommand("reboot").blocked).toBe(true);
+    expect(isDestructiveCommand("halt").blocked).toBe(true);
+    expect(isDestructiveCommand("poweroff").blocked).toBe(true);
+  });
+
+  it("does NOT block normal commands", () => {
+    expect(isDestructiveCommand("ls -la").blocked).toBe(false);
+    expect(isDestructiveCommand("git status").blocked).toBe(false);
+    expect(isDestructiveCommand("npm install").blocked).toBe(false);
+    expect(isDestructiveCommand("cat /etc/hosts").blocked).toBe(false);
+    expect(isDestructiveCommand("echo hello").blocked).toBe(false);
+    expect(isDestructiveCommand("mkdir -p /tmp/test").blocked).toBe(false);
+  });
+
+  it("returns reason for blocked commands", () => {
+    const result = isDestructiveCommand("rm -rf /");
+    expect(result.blocked).toBe(true);
+    expect(result.reason).toBeTruthy();
+    expect(typeof result.reason).toBe("string");
+  });
+
+  it("returns empty reason for allowed commands", () => {
+    const result = isDestructiveCommand("ls -la");
+    expect(result.blocked).toBe(false);
+    expect(result.reason).toBe("");
+  });
+
+  it("handles empty/whitespace commands", () => {
+    expect(isDestructiveCommand("").blocked).toBe(false);
+    expect(isDestructiveCommand("   ").blocked).toBe(false);
   });
 });

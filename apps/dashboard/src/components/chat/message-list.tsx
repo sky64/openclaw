@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useCallback, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ChatCircleDots, SpinnerGap } from "@phosphor-icons/react"
 import { cn } from "@/lib/utils"
@@ -11,6 +11,8 @@ export interface MessageListProps {
   messages: ChatMessage[]
   loading?: boolean
   streaming?: boolean
+  onButtonClick?: (callbackData: string) => void
+  onReplySelect?: (message: ChatMessage) => void
   className?: string
 }
 
@@ -22,6 +24,8 @@ export function MessageList({
   messages,
   loading = false,
   streaming = false,
+  onButtonClick,
+  onReplySelect,
   className,
 }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -98,6 +102,10 @@ export function MessageList({
                 content={message.content}
                 timestamp={message.timestamp}
                 isStreaming={isStreamingMessage}
+                buttons={message.buttons}
+                replyTo={message.replyTo ? { content: message.replyTo.content, role: message.replyTo.role } : undefined}
+                onButtonClick={onButtonClick}
+                onReply={onReplySelect ? () => onReplySelect(message) : undefined}
               />
             )
           })}
